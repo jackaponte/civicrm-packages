@@ -55,7 +55,8 @@ function checkAuthentication() {
     switch ($config->userFramework) {
     case 'Drupal':
     case 'Drupal6':
-      $auth_function = 'authenticate_drupal';
+    case 'Backdrop':
+      $auth_function = 'authenticate_drupal_or_backdrop';
       break;
     case 'Joomla':
       $auth_function = 'authenticate_joomla';
@@ -78,11 +79,11 @@ function checkAuthentication() {
 }
 
 /**
- * If the user is already logged into Drupal, bootstrap
- * drupal with this user's permissions. Thanks to integrate/drupal.php
+ * If the user is already logged into Drupal or Backdrop, bootstrap
+ * Drupal/Backdrop with this user's permissions. Thanks to integrate/drupal.php
  * script for hints on how to do this.
  **/
-function authenticate_drupal($config) {
+function authenticate_drupal_or_backdrop($config) {
   global $base_url;
   $base_root = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
   $base_url = $base_root .= '://'. preg_replace('/[^a-z0-9-:._]/i', '', $_SERVER['HTTP_HOST']);
@@ -92,12 +93,12 @@ function authenticate_drupal($config) {
     $base_url .= $base_path;
   }
 
-  // correct base_url so it points to Drupal root
+  // correct base_url so it points to Drupal or Backdrop root
   $pos = strpos($base_url, '/sites/');
   if ($pos === FALSE) {
     $pos = strpos($base_url, '/profiles/');
   }
-  $base_url = substr($base_url, 0, $pos); // drupal root absolute url
+  $base_url = substr($base_url, 0, $pos); // Drupal/Backdrop root absolute url
 
   CRM_Utils_System::loadBootStrap(CRM_Core_DAO::$_nullArray,true,false);
 
